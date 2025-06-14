@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KPL Fantasy League with SMS</title>
+  <style>
+    /* Fullscreen video background */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+      background: rgba(0, 51, 0, 0.8);
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ffffff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .player {
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      border: 1px solid #ccc;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: transform 0.3s;
+      text-align: center;
+    }
+
+    .player img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .player.selected {
+      background: #d4edda;
+      border: 2px solid #28a745;
+      color: #155724;
+    }
+
+    .summary {
+      margin-top: 20px;
+      background: #ffffff;
+      color: #000;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    #smsLink {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    #smsLink:disabled,
+    #smsLink[aria-disabled="true"] {
+      background: #888;
+      pointer-events: none;
+    }
+
+    select {
+      margin: 10px 0;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Video Background -->
+  <video autoplay muted loop id="bg-video">
+    <source src="your-video.mp4" type="video/mp4" />
+    Your browser does not support HTML5 video.
+  </video>
+
+  <main>
+    <h1>KPL Fantasy League</h1>
+    <p>Select up to 15 players within a budget of 100.0</p>
+
+    <!-- Sorting dropdown -->
+    <select onchange="sortPlayers(this.value)">
+      <option value="">Sort Players</option>
+      <option value="price">By Price</option>
+      <option value="pos">By Position</option>
+    </select>
+
+    <div class="grid" id="playerList"></div>
+
+    <div class="summary">
+      <h3>My Squad (<span id="count">0</span>/15)</h3>
+      <ul id="squadList"></ul>
+      <p>Total Spent: <span id="total">0.0</span> / 100.0</p>
+      <button onclick="saveSquad()">💾 Save Squad</button>
+      <br />
+      <a href="#" id="smsLink" aria-disabled="true">📱 Send Team via SMS</a>
+    </div>
+  </main>
+
+  <script>
+    let players = [
+      {
+        name: "Benson Omala",
+        team: "Gor Mahia",
+        pos: "FW",
+        price: 8.0,
+        image: "https://via.placeholder.com/200x150?text=Omala"
+      },
+      {
+        name: "Michael Olunga",
+        team: "AFC Leopards",
+        pos: "MF",
+        price: 9.0,
+        image: "https://via.placeholder.com/200x150?text=Olunga"
+      },
+      {
+        name: "Levis Opiyo",
+        team: "AFC Leopards",
+        pos: "GK",
+        price: 5.0,
+        image: "https://via.placeholder.com/200x150?text=Opiyo"
+      },
+      {
+        name: "Joseph Okumu",
+        team: "AFC Leopards",
+        pos: "DF",
+        price: 6.0,
+        image: "https://via.placeholder.com/200x150?text=Okumu"
+      },
+      {
+        name: "Austin Odhiambo",
+        team: "Gor Mahia",
+        pos: "MF",
+        price: 6.5,
+        image: "https://via.placeholder.com/200x150?text=Austin"
+      }
+    ];
+
+    const maxPlayers = 15;
+    const budget = 100.0;
+    let selected = [];
+
+    const playerList = document.getElementById("playerList");
+    const squadList = document.getElementById("squadList");
+    const countSpan = document.getElementById("count");
+    const totalSpan = document.getElementById("total");
+    const smsLink = document.getElementById("smsLink");
+
+    function renderPlayers() {
+      playerList.innerHTML = "";
+      players.forEach((player, index) => {
+        const div = document.createElement("div");
+        div.className = "player";
+        div.id = `player-${index}`;
+        div.innerHTML = `
+          <img src="${player.image}" alt="${player.name}" />
+          <strong>${player.name}</strong><br />
+          ${player.team}<br />
+          ${player.pos} - Ksh ${player.price.toFixed(1)}
+        `;
+        div.onclick = () => togglePlayer(index);
+        playerList.appendChild(div);
+      });
+    }
+
+    function updateUI() {
+      squadList.innerHTML = "";
+      selected.forEach(p => {
+        const li = document.createElement("li");
+        li.textContent = `${p.name} (${p.pos}) - ${p.price.toFixed(1)}`;
+        squadList.appendChild(li);
+      });
+
+      countSpan.textContent = selected.length;
+      const total = selected.reduce((sum, p) => sum + p.price, 0);
+      totalSpan.textContent = total.toFixed(1);
+
+      players.forEach((p, i) => {
+        const card = document.getElementById(`player-${i}`);
+        card.classList.toggle("selected", selected.includes(p));
+      });
+
+      if (selected.length > 0) {
+        smsLink.removeAttribute("aria-disabled");
+        smsLink.style.pointerEvents = "auto";
+        updateSMSLink();
+      } else {
+        smsLink.setAttribute("aria-disabled", "true");
+        smsLink.style.pointerEvents = "none";
+        smsLink.href = "#";
+      }
+    }
+
+    function togglePlayer(index) {
+      const player = players[index];
+      const total = selected.reduce((sum, p) => sum + p.price, 0);
+
+      if (selected.includes(player)) {
+        selected = selected.filter(p => p !== player);
+      } else {
+        if (selected.length >= maxPlayers) {
+          alert("You can't select more than 15 players.");
+          return;
+        }
+        if (total + player.price > budget) {
+          alert("Adding this player exceeds your budget!");
+          return;
+        }
+        selected.push(player);
+      }
+      updateUI();
+    }
+
+    function saveSquad() {
+      localStorage.setItem("mySquad", JSON.stringify(selected));
+      alert("Squad saved in your browser!");
+    }
+
+    function loadSquad() {
+      const saved = localStorage.getItem("mySquad");
+      if (saved) {
+        const savedPlayers = JSON.parse(saved);
+        selected = players.filter(p => savedPlayers.some(sp => sp.name === p.name));
+      }
+      updateUI();
+    }
+
+    function updateSMSLink() {
+      const message = selected.map(p => p.name).join(", ");
+      const smsBody = encodeURIComponent(`My KPL Fantasy Team: ${message}`);
+      smsLink.href = `sms:+25419269219?body=${smsBody}`;
+    }
+
+    function sortPlayers(criteria) {
+      if (criteria === "price") {
+        players.sort((a, b) => a.price - b.price);
+      } else if (criteria === "pos") {
+        players.sort((a, b) => a.pos.localeCompare(b.pos));
+      }
+      renderPlayers();
+      updateUI();
+    }
+
+    renderPlayers();
+    loadSquad();
+  </script>
+</body>
+</html>
