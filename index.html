@@ -2,302 +2,164 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kenya Fantasy Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KFP - Kenya Fantasy Pro</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
       color: #fff;
       background-color: #000;
+      overflow-x: hidden;
     }
 
-    #bg-video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      min-width: 100%;
-      min-height: 100%;
-      object-fit: cover;
-      z-index: -1;
-    }
-
-    main {
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
-      background: rgba(0, 51, 0, 0.9);
-      border-radius: 10px;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    .grid, .jersey-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-    }
-
-    .player, .jersey {
-      background: rgba(255, 255, 255, 0.9);
-      color: #000;
-      border: 1px solid #ccc;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 10px;
-      transition: transform 0.3s;
-      text-align: center;
-    }
-
-    .player img, .jersey img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 5px;
-      margin-bottom: 10px;
-    }
-
-    .player.selected {
-      border: 2px solid #28a745;
-      background: #d4edda;
-    }
-
-    #toggleBtn {
-      background: #28a745;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      margin-bottom: 10px;
-      cursor: pointer;
-    }
-
-    .pitch {
-      background: linear-gradient(to bottom, #006400, #228B22);
-      border: 3px solid #fff;
-      border-radius: 10px;
-      padding: 20px;
-      text-align: center;
-      display: grid;
-      grid-template-rows: repeat(4, auto);
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .lineup {
+    header {
+      height: 100vh;
+      background: linear-gradient(160deg, rgba(0,0,0,0.8), rgba(0,51,0,0.9)), url('https://images.unsplash.com/photo-1547332184-029d3a92797d') no-repeat center center/cover;
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      animation: fadeIn 2s ease-in;
     }
 
-    .player-slot {
-      background: rgba(255, 255, 255, 0.9);
-      color: #000;
-      padding: 5px;
-      border-radius: 5px;
-      width: 90px;
-      font-size: 12px;
+    header h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: slideInFromTop 1s ease-out;
     }
 
-    .player-slot img {
-      width: 100%;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 5px;
+    header p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin-bottom: 2rem;
+      animation: fadeIn 2s ease-out;
     }
 
-    #smsLink {
+    .cta-buttons a {
       display: inline-block;
       background: #28a745;
-      color: white;
-      padding: 10px 20px;
+      color: #fff;
+      padding: 12px 20px;
+      margin: 10px;
       text-decoration: none;
-      border-radius: 5px;
-      margin-top: 10px;
+      border-radius: 30px;
       font-weight: bold;
+      transition: background 0.3s ease;
     }
 
-    .jersey-section {
-      margin-top: 30px;
-      background: rgba(0, 0, 0, 0.6);
+    .cta-buttons a:hover {
+      background: #1e7e34;
+    }
+
+    section {
+      padding: 3rem 2rem;
+      text-align: center;
+      animation: fadeIn 2s ease-in;
+    }
+
+    section h2 {
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 2rem;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.1);
       padding: 20px;
       border-radius: 10px;
+      border: 1px solid #444;
+      transition: transform 0.3s ease;
     }
 
-    .jersey h2 {
-      text-align: center;
+    .feature-card:hover {
+      transform: scale(1.05);
+    }
+
+    .feature-card h3 {
       margin-bottom: 10px;
+      color: #28a745;
     }
 
-    .jersey .buy-btn {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 8px 12px;
-      background: #007bff;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
+    .feature-card p {
+      font-size: 0.95rem;
+      color: #ccc;
+    }
+
+    footer {
+      background: #111;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInFromTop {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
   </style>
 </head>
 <body>
 
-<video autoplay muted loop id="bg-video">
-  <source src="KFP1.mp4" type="video/mp4" />
-</video>
+  <header>
+    <h1>Kenya Fantasy Pro (KFP)</h1>
+    <p>Play. Win. Support Local Football. Kenya’s first official fantasy football platform, bringing the KPL to your fingertips.</p>
+    <div class="cta-buttons">
+      <a href="fantasy.html">🎮 Play Now</a>
+      <a href="#features">📢 Learn More</a>
+    </div>
+  </header>
 
-<main>
-  <h1>Kenya Fantasy Pro</h1>
-  <p>Select up to 11 players within a budget of 100.0</p>
-
-  <button onclick="togglePlayerList()" id="toggleBtn">🔽 Hide Player List</button>
-  <div id="playerSection" style="overflow: hidden; transition: max-height 0.3s ease;">
-    <div class="grid" id="playerList"></div>
-  </div>
-
-  <div class="pitch" id="pitch">
-    <div><strong>Goalkeeper</strong><div class="lineup" id="gkRow"></div></div>
-    <div><strong>Defenders</strong><div class="lineup" id="dfRow"></div></div>
-    <div><strong>Midfielders</strong><div class="lineup" id="mfRow"></div></div>
-    <div><strong>Forwards</strong><div class="lineup" id="fwRow"></div></div>
-  </div>
-
-  <p>Total Selected: <span id="count">0</span> / 11 — Budget: <span id="total">0.0</span> / 100.0</p>
-  <button onclick="autoSelect()">🔄 Auto Select</button>
-  <a href="#" id="smsLink" aria-disabled="true">📱 Send Team via SMS</a>
-
-  <!-- ✅ Jersey Selling Section -->
-  <div class="jersey-section">
-    <h2>🧥 Buy Official KPL Jerseys</h2>
-    <div class="jersey-grid">
-      <div class="jersey">
-        <img src="https://example.com/gor-jersey.jpg" alt="Gor Mahia Jersey">
-        <strong>Gor Mahia Jersey</strong><br />Ksh 1,500
-        <a href="https://wa.me/2547XXXXXXX?text=I%20want%20to%20buy%20Gor%20Mahia%20jersey" class="buy-btn">Buy Now</a>
+  <section id="features">
+    <h2>What’s Inside KFP?</h2>
+    <div class="features">
+      <div class="feature-card">
+        <h3>⚽ Fantasy League</h3>
+        <p>Create your dream KPL team, earn points weekly, and top the leaderboard.</p>
       </div>
-      <div class="jersey">
-        <img src="https://example.com/shabana-jersey.jpg" alt="Shabana Jersey">
-        <strong>Shabana Jersey</strong><br />Ksh 1,400
-        <a href="https://wa.me/2547XXXXXXX?text=I%20want%20to%20buy%20Shabana%20jersey" class="buy-btn">Buy Now</a>
+      <div class="feature-card">
+        <h3>👕 Official Jerseys</h3>
+        <p>Buy authentic Gor Mahia, Shabana, AFC and more jerseys at fair prices.</p>
       </div>
-      <div class="jersey">
-        <img src="https://example.com/afc-leopards-jersey.jpg" alt="AFC Leopards Jersey">
-        <strong>AFC Leopards Jersey</strong><br />Ksh 1,450
-        <a href="https://wa.me/2547XXXXXXX?text=I%20want%20to%20buy%20AFC%20Leopards%20jersey" class="buy-btn">Buy Now</a>
+      <div class="feature-card">
+        <h3>🎟️ Match Tickets</h3>
+        <p>Book game day tickets online or via SMS. No queues, no stress!</p>
+      </div>
+      <div class="feature-card">
+        <h3>🚌 Travel with Fans</h3>
+        <p>Join official fan buses to away matches and support your team live.</p>
       </div>
     </div>
-  </div>
+  </section>
 
-</main>
+  <footer>
+    &copy; 2025 Kenya Fantasy Pro. Made with ❤️ in Kenya.
+  </footer>
 
-<script>
-  const players = [/* same player list as before */];
-
-  const maxPlayers = 11;
-  const budget = 100.0;
-  let selected = [];
-
-  const playerList = document.getElementById("playerList");
-  const countSpan = document.getElementById("count");
-  const totalSpan = document.getElementById("total");
-  const smsLink = document.getElementById("smsLink");
-
-  function renderPlayers() {
-    playerList.innerHTML = "";
-    players.forEach((player, index) => {
-      const div = document.createElement("div");
-      div.className = "player";
-      div.innerHTML = `<img src="${player.image}" alt="${player.name}" />
-                      <strong>${player.name}</strong><br />
-                      ${player.pos} - ${player.team}<br />
-                      Ksh ${player.price}`;
-      div.onclick = () => togglePlayer(index);
-      if (selected.includes(player)) div.classList.add("selected");
-      playerList.appendChild(div);
-    });
-  }
-
-  function renderPitch() {
-    const posGroups = {
-      GK: document.getElementById("gkRow"),
-      DF: document.getElementById("dfRow"),
-      MF: document.getElementById("mfRow"),
-      FW: document.getElementById("fwRow"),
-    };
-    for (let key in posGroups) posGroups[key].innerHTML = "";
-    selected.forEach(p => {
-      const div = document.createElement("div");
-      div.className = "player-slot";
-      div.innerHTML = `<img src="${p.image}" /><br />${p.name}`;
-      posGroups[p.pos].appendChild(div);
-    });
-
-    countSpan.textContent = selected.length;
-    const total = selected.reduce((sum, p) => sum + p.price, 0);
-    totalSpan.textContent = total.toFixed(1);
-
-    updateSMSLink();
-    renderPlayers();
-  }
-
-  function togglePlayer(index) {
-    const player = players[index];
-    const total = selected.reduce((sum, p) => sum + p.price, 0);
-    if (selected.includes(player)) {
-      selected = selected.filter(p => p !== player);
-    } else {
-      if (selected.length >= maxPlayers || total + player.price > budget) return;
-      selected.push(player);
-    }
-    renderPitch();
-  }
-
-  function togglePlayerList() {
-    const section = document.getElementById("playerSection");
-    const button = document.getElementById("toggleBtn");
-    if (section.style.maxHeight && section.style.maxHeight !== "0px") {
-      section.style.maxHeight = "0px";
-      button.innerText = "🔼 Show Player List";
-    } else {
-      section.style.maxHeight = section.scrollHeight + "px";
-      button.innerText = "🔽 Hide Player List";
-    }
-  }
-
-  function autoSelect() {
-    const shuffled = players.sort(() => 0.5 - Math.random());
-    selected = [];
-    let total = 0;
-    for (let p of shuffled) {
-      if (selected.length >= maxPlayers) break;
-      if (total + p.price <= budget) {
-        selected.push(p);
-        total += p.price;
-      }
-    }
-    renderPitch();
-  }
-
-  function updateSMSLink() {
-    if (selected.length === 0) {
-      smsLink.setAttribute("aria-disabled", "true");
-      smsLink.href = "#";
-    } else {
-      smsLink.removeAttribute("aria-disabled");
-      const body = encodeURIComponent("My KPL Fantasy Squad: " + selected.map(p => p.name).join(", "));
-      smsLink.href = `sms:+25419269219?body=${body}`;
-    }
-  }
-
-  window.onload = () => {
-    renderPlayers();
-    if (selected.length === 0) autoSelect();
-  };
-</script>
 </body>
 </html>
