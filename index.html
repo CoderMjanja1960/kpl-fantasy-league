@@ -35,13 +35,13 @@
       text-align: center;
     }
 
-    .grid {
+    .grid, .jersey-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 15px;
     }
 
-    .player {
+    .player, .jersey {
       background: rgba(255, 255, 255, 0.9);
       color: #000;
       border: 1px solid #ccc;
@@ -52,7 +52,7 @@
       text-align: center;
     }
 
-    .player img {
+    .player img, .jersey img {
       width: 100%;
       height: 150px;
       object-fit: cover;
@@ -120,156 +120,184 @@
       margin-top: 10px;
       font-weight: bold;
     }
+
+    .jersey-section {
+      margin-top: 30px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .jersey h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .jersey .buy-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #007bff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
-  <video autoplay muted loop id="bg-video">
-    <source src="KFP1.mp4" type="video/mp4" />
-  </video>
+<video autoplay muted loop id="bg-video">
+  <source src="KFP1.mp4" type="video/mp4" />
+</video>
 
-  <main>
-    <h1>KFP</h1>
-    <p>Select up to 11 players within a budget of 100.0</p>
+<main>
+  <h1>Kenya Fantasy Pro</h1>
+  <p>Select up to 11 players within a budget of 100.0</p>
 
-    <button onclick="togglePlayerList()" id="toggleBtn">🔽 Hide Player List</button>
-    <div id="playerSection" style="overflow: hidden; transition: max-height 0.3s ease;">
-      <div class="grid" id="playerList"></div>
+  <button onclick="togglePlayerList()" id="toggleBtn">🔽 Hide Player List</button>
+  <div id="playerSection" style="overflow: hidden; transition: max-height 0.3s ease;">
+    <div class="grid" id="playerList"></div>
+  </div>
+
+  <div class="pitch" id="pitch">
+    <div><strong>Goalkeeper</strong><div class="lineup" id="gkRow"></div></div>
+    <div><strong>Defenders</strong><div class="lineup" id="dfRow"></div></div>
+    <div><strong>Midfielders</strong><div class="lineup" id="mfRow"></div></div>
+    <div><strong>Forwards</strong><div class="lineup" id="fwRow"></div></div>
+  </div>
+
+  <p>Total Selected: <span id="count">0</span> / 11 — Budget: <span id="total">0.0</span> / 100.0</p>
+  <button onclick="autoSelect()">🔄 Auto Select</button>
+  <a href="#" id="smsLink" aria-disabled="true">📱 Send Team via SMS</a>
+
+  <!-- ✅ Jersey Selling Section -->
+  <div class="jersey-section">
+    <h2>🧥 Buy Official KPL Jerseys</h2>
+    <div class="jersey-grid">
+      <div class="jersey">
+        <img src="https://example.com/gor-jersey.jpg" alt="Gor Mahia Jersey">
+        <strong>Gor Mahia Jersey</strong><br />Ksh 1,500
+        <a href="https://wa.me/2547XXXXXXX?text=I%20want%20to%20buy%20Gor%20Mahia%20jersey" class="buy-btn">Buy Now</a>
+      </div>
+      <div class="jersey">
+        <img src="https://example.com/shabana-jersey.jpg" alt="Shabana Jersey">
+        <strong>Shabana Jersey</strong><br />Ksh 1,400
+        <a href="https://wa.me/2547XXXXXXX?text=I%20want%20to%20buy%20Shabana%20jersey" class="buy-btn">Buy Now</a>
+      </div>
+      <div class="jersey">
+        <img src="https://example.com/afc-leopards-jersey.jpg" alt="AFC Leopards Jersey">
+        <strong>AFC Leopards Jersey</strong><br />Ksh 1,450
+        <a href="https://wa.me/2547XXXXXXX?text=I%20want%20to%20buy%20AFC%20Leopards%20jersey" class="buy-btn">Buy Now</a>
+      </div>
     </div>
+  </div>
 
-    <div class="pitch" id="pitch">
-      <div><strong>Goalkeeper</strong><div class="lineup" id="gkRow"></div></div>
-      <div><strong>Defenders</strong><div class="lineup" id="dfRow"></div></div>
-      <div><strong>Midfielders</strong><div class="lineup" id="mfRow"></div></div>
-      <div><strong>Forwards</strong><div class="lineup" id="fwRow"></div></div>
-    </div>
+</main>
 
-    <p>Total Selected: <span id="count">0</span> / 11 — Budget: <span id="total">0.0</span> / 100.0</p>
-    <button onclick="autoSelect()">🔄 Auto Select</button>
-    <a href="#" id="smsLink" aria-disabled="true">📱 Send Team via SMS</a>
-  </main>
+<script>
+  const players = [/* same player list as before */];
 
-  <script>
-    const players = [
-      { name: "Benson Omala", team: "Gor Mahia", pos: "FW", price: 8.0, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
-      { name: "Michael Olunga", team: "AFC Leopards", pos: "FW", price: 9.5, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
-      { name: "Levis Opiyo", team: "Posta Rangers", pos: "GK", price: 5.0, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
-      { name: "Joseph Okumu", team: "KCB", pos: "DF", price: 6.0, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
-      { name: "Austin Odhiambo", team: "Gor Mahia", pos: "MF", price: 6.5, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
-      { name: "David Owino", team: "Tusker FC", pos: "DF", price: 6.3, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
-      { name: "Clifton Miheso", team: "Police FC", pos: "MF", price: 6.9, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
-      { name: "Brian Bwire", team: "Kariobangi Sharks", pos: "GK", price: 4.8, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
-      { name: "Enock Agwanda", team: "Bandari", pos: "FW", price: 7.2, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
-      { name: "Duke Abuya", team: "Nzoia Sugar", pos: "MF", price: 5.5, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
-      { name: "Kennedy Ochieng", team: "Ulinzi Stars", pos: "DF", price: 5.7, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" }
-    ];
+  const maxPlayers = 11;
+  const budget = 100.0;
+  let selected = [];
 
-    const maxPlayers = 11;
-    const budget = 100.0;
-    let selected = [];
+  const playerList = document.getElementById("playerList");
+  const countSpan = document.getElementById("count");
+  const totalSpan = document.getElementById("total");
+  const smsLink = document.getElementById("smsLink");
 
-    const playerList = document.getElementById("playerList");
-    const countSpan = document.getElementById("count");
-    const totalSpan = document.getElementById("total");
-    const smsLink = document.getElementById("smsLink");
+  function renderPlayers() {
+    playerList.innerHTML = "";
+    players.forEach((player, index) => {
+      const div = document.createElement("div");
+      div.className = "player";
+      div.innerHTML = `<img src="${player.image}" alt="${player.name}" />
+                      <strong>${player.name}</strong><br />
+                      ${player.pos} - ${player.team}<br />
+                      Ksh ${player.price}`;
+      div.onclick = () => togglePlayer(index);
+      if (selected.includes(player)) div.classList.add("selected");
+      playerList.appendChild(div);
+    });
+  }
 
-    function renderPlayers() {
-      playerList.innerHTML = "";
-      players.forEach((player, index) => {
-        const div = document.createElement("div");
-        div.className = "player";
-        div.innerHTML = `<img src="${player.image}" alt="${player.name}" />
-                         <strong>${player.name}</strong><br />
-                         ${player.pos} - ${player.team}<br />
-                         Ksh ${player.price}`;
-        div.onclick = () => togglePlayer(index);
-        if (selected.includes(player)) div.classList.add("selected");
-        playerList.appendChild(div);
-      });
-    }
-
-    function renderPitch() {
-      const posGroups = {
-        GK: document.getElementById("gkRow"),
-        DF: document.getElementById("dfRow"),
-        MF: document.getElementById("mfRow"),
-        FW: document.getElementById("fwRow"),
-      };
-
-      for (let key in posGroups) posGroups[key].innerHTML = "";
-
-      selected.forEach(p => {
-        const div = document.createElement("div");
-        div.className = "player-slot";
-        div.innerHTML = `<img src="${p.image}" /><br />${p.name}`;
-        posGroups[p.pos].appendChild(div);
-      });
-
-      countSpan.textContent = selected.length;
-      const total = selected.reduce((sum, p) => sum + p.price, 0);
-      totalSpan.textContent = total.toFixed(1);
-
-      updateSMSLink();
-      renderPlayers();
-    }
-
-    function togglePlayer(index) {
-      const player = players[index];
-      const total = selected.reduce((sum, p) => sum + p.price, 0);
-
-      if (selected.includes(player)) {
-        selected = selected.filter(p => p !== player);
-      } else {
-        if (selected.length >= maxPlayers || total + player.price > budget) return;
-        selected.push(player);
-      }
-      renderPitch();
-    }
-
-    function togglePlayerList() {
-      const section = document.getElementById("playerSection");
-      const button = document.getElementById("toggleBtn");
-      if (section.style.maxHeight && section.style.maxHeight !== "0px") {
-        section.style.maxHeight = "0px";
-        button.innerText = "🔼 Show Player List";
-      } else {
-        section.style.maxHeight = section.scrollHeight + "px";
-        button.innerText = "🔽 Hide Player List";
-      }
-    }
-
-    function autoSelect() {
-      const shuffled = players.sort(() => 0.5 - Math.random());
-      selected = [];
-      let total = 0;
-
-      for (let p of shuffled) {
-        if (selected.length >= maxPlayers) break;
-        if (total + p.price <= budget) {
-          selected.push(p);
-          total += p.price;
-        }
-      }
-
-      renderPitch();
-    }
-
-    function updateSMSLink() {
-      if (selected.length === 0) {
-        smsLink.setAttribute("aria-disabled", "true");
-        smsLink.href = "#";
-      } else {
-        smsLink.removeAttribute("aria-disabled");
-        const body = encodeURIComponent("My KPL Fantasy Squad: " + selected.map(p => p.name).join(", "));
-        smsLink.href = `sms:+25419269219?body=${body}`;
-      }
-    }
-
-    // Auto select if squad empty on refresh
-    window.onload = () => {
-      renderPlayers();
-      if (selected.length === 0) autoSelect();
+  function renderPitch() {
+    const posGroups = {
+      GK: document.getElementById("gkRow"),
+      DF: document.getElementById("dfRow"),
+      MF: document.getElementById("mfRow"),
+      FW: document.getElementById("fwRow"),
     };
-  </script>
+    for (let key in posGroups) posGroups[key].innerHTML = "";
+    selected.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "player-slot";
+      div.innerHTML = `<img src="${p.image}" /><br />${p.name}`;
+      posGroups[p.pos].appendChild(div);
+    });
+
+    countSpan.textContent = selected.length;
+    const total = selected.reduce((sum, p) => sum + p.price, 0);
+    totalSpan.textContent = total.toFixed(1);
+
+    updateSMSLink();
+    renderPlayers();
+  }
+
+  function togglePlayer(index) {
+    const player = players[index];
+    const total = selected.reduce((sum, p) => sum + p.price, 0);
+    if (selected.includes(player)) {
+      selected = selected.filter(p => p !== player);
+    } else {
+      if (selected.length >= maxPlayers || total + player.price > budget) return;
+      selected.push(player);
+    }
+    renderPitch();
+  }
+
+  function togglePlayerList() {
+    const section = document.getElementById("playerSection");
+    const button = document.getElementById("toggleBtn");
+    if (section.style.maxHeight && section.style.maxHeight !== "0px") {
+      section.style.maxHeight = "0px";
+      button.innerText = "🔼 Show Player List";
+    } else {
+      section.style.maxHeight = section.scrollHeight + "px";
+      button.innerText = "🔽 Hide Player List";
+    }
+  }
+
+  function autoSelect() {
+    const shuffled = players.sort(() => 0.5 - Math.random());
+    selected = [];
+    let total = 0;
+    for (let p of shuffled) {
+      if (selected.length >= maxPlayers) break;
+      if (total + p.price <= budget) {
+        selected.push(p);
+        total += p.price;
+      }
+    }
+    renderPitch();
+  }
+
+  function updateSMSLink() {
+    if (selected.length === 0) {
+      smsLink.setAttribute("aria-disabled", "true");
+      smsLink.href = "#";
+    } else {
+      smsLink.removeAttribute("aria-disabled");
+      const body = encodeURIComponent("My KPL Fantasy Squad: " + selected.map(p => p.name).join(", "));
+      smsLink.href = `sms:+25419269219?body=${body}`;
+    }
+  }
+
+  window.onload = () => {
+    renderPlayers();
+    if (selected.length === 0) autoSelect();
+  };
+</script>
 </body>
 </html>
