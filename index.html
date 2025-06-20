@@ -1,94 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kenya Fantasy Pro - Local Index</title>
-  <meta name="description" content="Kenya Fantasy Pro is the official Kenyan Premier League fantasy football game. Play, compete, and win with your football knowledge." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kenya Fantasy Pro</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      font-family: 'Trebuchet MS', Verdana, sans-serif;
-      background: #002f1e;
       color: #fff;
+      background-color: #000;
     }
 
-    header {
-      background: #008040;
-      padding: 10px;
-      text-align: center;
-      color: #fff;
-      font-size: 24px;
-      font-weight: bold;
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      z-index: -1;
     }
 
     main {
-      padding: 40px 20px;
-      max-width: 800px;
+      padding: 20px;
+      max-width: 1000px;
       margin: auto;
-      background: #004d29;
+      background: rgba(0, 51, 0, 0.9);
       border-radius: 10px;
+    }
+
+    h1 {
       text-align: center;
     }
 
-    a {
-      color: #ffd700;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .player {
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      border: 1px solid #ccc;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: transform 0.3s;
+      text-align: center;
+    }
+
+    .player img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .player.selected {
+      border: 2px solid #28a745;
+      background: #d4edda;
+    }
+
+    #toggleBtn {
+      background: #28a745;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .pitch {
+      background: linear-gradient(to bottom, #006400, #228B22);
+      border: 3px solid #fff;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      display: grid;
+      grid-template-rows: repeat(4, auto);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .lineup {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .player-slot {
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      padding: 5px;
+      border-radius: 5px;
+      width: 90px;
+      font-size: 12px;
+    }
+
+    .player-slot img {
+      width: 100%;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    #smsLink {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      padding: 10px 20px;
       text-decoration: none;
-      font-size: 18px;
+      border-radius: 5px;
+      margin-top: 10px;
       font-weight: bold;
     }
-
-    a:hover {
-      text-decoration: underline;
-      color: #fff;
-    }
-
-    .link-card {
-      background: #006633;
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    footer {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 14px;
-      color: #ccc;
-    }
   </style>
-
-  <!-- Auto redirect to KFP app (optional - comment if not needed) -->
-  <meta http-equiv="refresh" content="3; url=kenya-fantasy-pro/index.html" />
 </head>
-
 <body>
 
-  <header>
-    Kenya Fantasy Pro
-  </header>
+  <video autoplay muted loop id="bg-video">
+    <source src="KFP1.mp4" type="video/mp4" />
+  </video>
 
   <main>
-    <h1>Welcome to the Kenya Fantasy Pro (KFP)</h1>
-    <p>The official Kenyan Premier League Fantasy Football Game.</p>
+    <h1>KFP</h1>
+    <p>Select up to 11 players within a budget of 100.0</p>
 
-    <div class="link-card">
-      &bull;
-      <a href="kenya-fantasy-pro/index.html">
-        Launch KFP Fantasy App
-      </a>
+    <button onclick="togglePlayerList()" id="toggleBtn">🔽 Hide Player List</button>
+    <div id="playerSection" style="overflow: hidden; transition: max-height 0.3s ease;">
+      <div class="grid" id="playerList"></div>
     </div>
 
-    <p style="margin-top: 30px;">Redirecting you automatically... If not redirected, click above.</p>
+    <div class="pitch" id="pitch">
+      <div><strong>Goalkeeper</strong><div class="lineup" id="gkRow"></div></div>
+      <div><strong>Defenders</strong><div class="lineup" id="dfRow"></div></div>
+      <div><strong>Midfielders</strong><div class="lineup" id="mfRow"></div></div>
+      <div><strong>Forwards</strong><div class="lineup" id="fwRow"></div></div>
+    </div>
+
+    <p>Total Selected: <span id="count">0</span> / 11 — Budget: <span id="total">0.0</span> / 100.0</p>
+    <button onclick="autoSelect()">🔄 Auto Select</button>
+    <a href="#" id="smsLink" aria-disabled="true">📱 Send Team via SMS</a>
   </main>
 
-  <footer>
-    &copy; 2025 Kenya Fantasy Pro. All rights reserved.
-  </footer>
+  <script>
+    const players = [
+      { name: "Benson Omala", team: "Gor Mahia", pos: "FW", price: 8.0, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
+      { name: "Michael Olunga", team: "AFC Leopards", pos: "FW", price: 9.5, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
+      { name: "Levis Opiyo", team: "Posta Rangers", pos: "GK", price: 5.0, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
+      { name: "Joseph Okumu", team: "KCB", pos: "DF", price: 6.0, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
+      { name: "Austin Odhiambo", team: "Gor Mahia", pos: "MF", price: 6.5, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
+      { name: "David Owino", team: "Tusker FC", pos: "DF", price: 6.3, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
+      { name: "Clifton Miheso", team: "Police FC", pos: "MF", price: 6.9, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
+      { name: "Brian Bwire", team: "Kariobangi Sharks", pos: "GK", price: 4.8, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
+      { name: "Enock Agwanda", team: "Bandari", pos: "FW", price: 7.2, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
+      { name: "Duke Abuya", team: "Nzoia Sugar", pos: "MF", price: 5.5, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" },
+      { name: "Kennedy Ochieng", team: "Ulinzi Stars", pos: "DF", price: 5.7, image: "https://raw.githubusercontent.com/CoderMjanja1960/kpl-fantasy-league/main/kfl.png" }
+    ];
 
+    const maxPlayers = 11;
+    const budget = 100.0;
+    let selected = [];
+
+    const playerList = document.getElementById("playerList");
+    const countSpan = document.getElementById("count");
+    const totalSpan = document.getElementById("total");
+    const smsLink = document.getElementById("smsLink");
+
+    function renderPlayers() {
+      playerList.innerHTML = "";
+      players.forEach((player, index) => {
+        const div = document.createElement("div");
+        div.className = "player";
+        div.innerHTML = `<img src="${player.image}" alt="${player.name}" />
+                         <strong>${player.name}</strong><br />
+                         ${player.pos} - ${player.team}<br />
+                         Ksh ${player.price}`;
+        div.onclick = () => togglePlayer(index);
+        if (selected.includes(player)) div.classList.add("selected");
+        playerList.appendChild(div);
+      });
+    }
+
+    function renderPitch() {
+      const posGroups = {
+        GK: document.getElementById("gkRow"),
+        DF: document.getElementById("dfRow"),
+        MF: document.getElementById("mfRow"),
+        FW: document.getElementById("fwRow"),
+      };
+
+      for (let key in posGroups) posGroups[key].innerHTML = "";
+
+      selected.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "player-slot";
+        div.innerHTML = `<img src="${p.image}" /><br />${p.name}`;
+        posGroups[p.pos].appendChild(div);
+      });
+
+      countSpan.textContent = selected.length;
+      const total = selected.reduce((sum, p) => sum + p.price, 0);
+      totalSpan.textContent = total.toFixed(1);
+
+      updateSMSLink();
+      renderPlayers();
+    }
+
+    function togglePlayer(index) {
+      const player = players[index];
+      const total = selected.reduce((sum, p) => sum + p.price, 0);
+
+      if (selected.includes(player)) {
+        selected = selected.filter(p => p !== player);
+      } else {
+        if (selected.length >= maxPlayers || total + player.price > budget) return;
+        selected.push(player);
+      }
+      renderPitch();
+    }
+
+    function togglePlayerList() {
+      const section = document.getElementById("playerSection");
+      const button = document.getElementById("toggleBtn");
+      if (section.style.maxHeight && section.style.maxHeight !== "0px") {
+        section.style.maxHeight = "0px";
+        button.innerText = "🔼 Show Player List";
+      } else {
+        section.style.maxHeight = section.scrollHeight + "px";
+        button.innerText = "🔽 Hide Player List";
+      }
+    }
+
+    function autoSelect() {
+      const shuffled = players.sort(() => 0.5 - Math.random());
+      selected = [];
+      let total = 0;
+
+      for (let p of shuffled) {
+        if (selected.length >= maxPlayers) break;
+        if (total + p.price <= budget) {
+          selected.push(p);
+          total += p.price;
+        }
+      }
+
+      renderPitch();
+    }
+
+    function updateSMSLink() {
+      if (selected.length === 0) {
+        smsLink.setAttribute("aria-disabled", "true");
+        smsLink.href = "#";
+      } else {
+        smsLink.removeAttribute("aria-disabled");
+        const body = encodeURIComponent("My KPL Fantasy Squad: " + selected.map(p => p.name).join(", "));
+        smsLink.href = `sms:+25419269219?body=${body}`;
+      }
+    }
+
+    // Auto select if squad empty on refresh
+    window.onload = () => {
+      renderPlayers();
+      if (selected.length === 0) autoSelect();
+    };
+  </script>
 </body>
-
 </html>
